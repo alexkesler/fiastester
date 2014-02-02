@@ -113,7 +113,7 @@ public class FIASModel {
             if(record.getFormalName().toLowerCase().indexOf(searchString) == 0)
                 filteredRecords.add(record);
 
-            if(filteredRecords.size() > 7) break;
+            if(filteredRecords.size() > 10) break;
         }
 
         log.info("Find " + filteredRecords.size() + " by search: " + searchString);
