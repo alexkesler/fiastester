@@ -1,6 +1,8 @@
 package org.kesler.fiastester.gui.main;
 
 import com.alee.laf.combobox.WebComboBox;
+import com.alee.laf.list.WebList;
+import com.alee.laf.scroll.WebScrollPane;
 import com.alee.laf.text.WebTextField;
 import com.alee.managers.popup.PopupStyle;
 import com.alee.managers.popup.WebPopup;
@@ -9,14 +11,24 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import java.awt.event.*;
+import java.util.List;
 
 
 public class MainView extends JFrame {
 
-	public MainView() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    MainViewController controller;
+
+    private JLabel saxMessageLabel;
+    private WebList addressesList;
+    private WebPopup addressPopup;
+    private WebTextField  addressTextField;
+
+	public MainView(MainViewController controller) {
+		this.controller = controller;
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         createGUI();
-        setSize(300,200);
+        setSize(400,300);
 
         this.setLocationRelativeTo(null);
     }
@@ -25,17 +37,38 @@ public class MainView extends JFrame {
 
         JPanel mainPanel = new JPanel(new MigLayout("fill"));
 
-        final WebTextField addressTextField = new WebTextField(30);
-        final WebPopup addressPopup = new WebPopup(PopupStyle.bevel);
+        addressTextField = new WebTextField(30);
+        addressPopup = new WebPopup(PopupStyle.lightSmall);
+        addressPopup.setRequestFocusOnShow(false);
+        addressPopup.setSize(addressTextField.getWidth(), 50);
 
 
         addressTextField.getDocument().addDocumentListener(new DocumentChangeListener() {
             @Override
             public void documentChanged(DocumentEvent documentEvent) {
+                controller.computeAddressesByString(addressTextField.getText());
+//                addressPopup.packPopup();
+//                addressPopup.showAsPopupMenu(addressTextField);
+//                addressTextField.requestFocus();
 
-                addressPopup.packPopup();
-                addressPopup.showAsPopupMenu(addressTextField);
-                addressTextField.requestFocus();
+            }
+        });
+
+        addressTextField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectAddress();
+            }
+        });
+
+        addressTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode()==KeyEvent.VK_DOWN ||
+                        e.getKeyCode()==KeyEvent.VK_UP) {
+                    addressesList.requestFocusInWindow();
+                    super.keyPressed(e);
+                }
 
             }
         });
@@ -43,16 +76,81 @@ public class MainView extends JFrame {
 
         String[] strings = {"Один","Два","Три","Очень длинный текст"};
 
-        JList addressVariantsList = new JList(strings);
+        addressesList = new WebList(strings);
+        addressesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        addressesList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(e.getClickCount()==2) selectAddress();
+            }
+        });
+        addressesList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+                if(e.getKeyCode() == KeyEvent.VK_ENTER) selectAddress();
+            }
+        });
 
-        addressPopup.add(addressVariantsList);
+        WebScrollPane addressesListScrollPane = new WebScrollPane(addressesList);
+
+        addressPopup.add(addressesListScrollPane);
+        addressPopup.setAnimated(true);
+
+
+
+        JButton readFIASButton = new JButton("Прочитать ФИАС");
+        readFIASButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.importFIAS();
+            }
+        });
+
+        saxMessageLabel = new JLabel("Сообщения о загрузке");
+
+        JButton saveFIASButton = new JButton("Выгрузить ФИАС");
+        saveFIASButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.exportFIAS();
+            }
+        });
+
 
         mainPanel.add(addressTextField, "wrap");
+        mainPanel.add(readFIASButton, "wrap");
+        mainPanel.add(saxMessageLabel, "wrap");
+        mainPanel.add(saveFIASButton, "wrap");
+//        mainPanel.add(addressesListScrollPane, "span, grow");
 
 
 
         this.setContentPane(mainPanel);
 
 	}
+
+    public void setSAXMessage(String message) {
+        saxMessageLabel.setText(message);
+    }
+
+    public void setAddresses(List<String> addresses) {
+        addressesList.setListData(addresses.toArray());
+
+        if(addresses.size() > 0) {
+            addressesList.setSelectedIndex(0);
+            if(!addressPopup.isShowing()){
+//                addressPopup.packPopup();
+                addressPopup.showPopup(addressTextField,0,addressTextField.getHeight());
+            }
+        }
+        else addressPopup.hidePopup();
+    }
+
+    private void selectAddress() {
+        addressTextField.setText((String)addressesList.getSelectedValue());
+        addressTextField.requestFocus();
+    }
 
 }

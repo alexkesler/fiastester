@@ -1,11 +1,9 @@
 package org.kesler.fiastester.dao;
 
-import org.kesler.fiastester.dao.impl.GenericDAOImpl;
-
-import org.kesler.fiastester.logic.FIASRecord;
+import org.kesler.fiastester.dao.impl.FIASRecordDAOImpl;
 
 public class DAOFactory {
-	private static GenericDAO<FIASRecord> fiasRecordDAO = null;
+	private static FIASRecordDAO fiasRecordDAO = null;
 
 	private static DAOFactory instance = null;
 
@@ -17,9 +15,9 @@ public class DAOFactory {
 	}
 
 
-	public GenericDAO<FIASRecord> getFiasRecordDAO() {
+	public FIASRecordDAO getFiasRecordDAO() {
 		if (fiasRecordDAO == null) {
-			fiasRecordDAO = new GenericDAOImpl<FIASRecord>(FIASRecord.class);
+			fiasRecordDAO = new FIASRecordDAOImpl();
 		}
 		return fiasRecordDAO;
 	}

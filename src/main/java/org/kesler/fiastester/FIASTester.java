@@ -1,12 +1,18 @@
 package org.kesler.fiastester;
 
-import org.kesler.fiastester.gui.main.MainView;
+
+import org.kesler.fiastester.gui.main.MainViewController;
+import org.kesler.fiastester.util.OptionsUtil;
 
 public class FIASTester {
 
 	public static void main(String args[]) {
-        MainView view = new MainView();
-        view.setVisible(true);
+
+        OptionsUtil.readOptions();
+        OptionsUtil.saveOptions();
+
+        MainViewController.getInstance().showMainView();
+
 	}
 
 }

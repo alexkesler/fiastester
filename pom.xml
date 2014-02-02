@@ -54,7 +54,7 @@
                     <mainClass>org.kesler.fiastester.FIASTester</mainClass>
                 </manifest>
                 <manifestEntries>
-                    <Version>${version}</Version>
+                    <Version>${project.version}</Version>
                 </manifestEntries>
             </archive>
         </configuration>
