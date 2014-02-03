@@ -31,7 +31,7 @@ public class FIASRecordDAOImpl implements FIASRecordDAO {
 		listeners.add(listener);
 	}
 
-    
+
     public void addRecords(List<FIASRecord> records) {
 
         notifyListeners(DAOState.CONNECTING);
