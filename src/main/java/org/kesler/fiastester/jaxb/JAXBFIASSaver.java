@@ -1,6 +1,7 @@
 package org.kesler.fiastester.jaxb;
 
 import com.alee.laf.filechooser.WebFileChooser;
+import org.apache.log4j.Logger;
 import org.kesler.fiastester.dao.DAOFactory;
 
 import javax.swing.filechooser.FileFilter;
@@ -14,6 +15,8 @@ import java.io.File;
  */
 public class JAXBFIASSaver {
 
+    private Logger log = Logger.getLogger(this.getClass().getSimpleName());
+
     private JAXBFIASListener listener;
 
     public JAXBFIASSaver(JAXBFIASListener listener) {
@@ -23,6 +26,7 @@ public class JAXBFIASSaver {
     public void saveFIAS(File file) {
 
         FIAS fias = new FIAS();
+        log.info("Reading records from DB");
         listener.jaxbMessage("Читаем список объектов из БД");
         fias.setRecords(DAOFactory.getInstance().getFiasRecordDAO().getAllRecords());
         try {
@@ -30,11 +34,14 @@ public class JAXBFIASSaver {
             Marshaller marshaller = context.createMarshaller();
 
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,true);
+            log.info("Saving XML to file: " + file.getPath());
             listener.jaxbMessage("Сохраняем в файл");
             marshaller.marshal(fias, file);
+            log.info("Saving complete.");
             listener.jaxbMessage("Готово");
 
         } catch (Exception e) {
+            log.error("Error saving XML", e);
             listener.jaxbMessage("Ошибка: " + e.getMessage());
             e.printStackTrace();
         }

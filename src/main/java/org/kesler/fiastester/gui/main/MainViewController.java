@@ -1,8 +1,9 @@
 package org.kesler.fiastester.gui.main;
 
 import com.alee.laf.filechooser.WebFileChooser;
+import org.kesler.fiastester.jaxb.JAXBFIASLoader;
 import org.kesler.fiastester.jaxb.JAXBFIASSaver;
-import org.kesler.fiastester.jaxb.JAXBFIASSaverListener;
+import org.kesler.fiastester.jaxb.JAXBFIASListener;
 import org.kesler.fiastester.logic.FIASModel;
 import org.kesler.fiastester.logic.FIASModelListener;
 import org.kesler.fiastester.sax.SAXFIASReader;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * Created by alex on 02.02.14.
  */
-public class MainViewController implements SAXFIASReaderListener, FIASModelListener, JAXBFIASSaverListener{
+public class MainViewController implements SAXFIASReaderListener, FIASModelListener, JAXBFIASListener{
 
     private static MainViewController instance = null;
 
@@ -69,8 +70,9 @@ public class MainViewController implements SAXFIASReaderListener, FIASModelListe
     public void exportFIAS() {
         WebFileChooser fileChooser = new WebFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Файлы XML","xml");
-        fileChooser.addChoosableFileFilter(filter);
         fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(filter);
+
 
         int result = fileChooser.showSaveDialog(mainView);
         if(result == WebFileChooser.APPROVE_OPTION) {
@@ -83,14 +85,14 @@ public class MainViewController implements SAXFIASReaderListener, FIASModelListe
     public void loadFIAS() {
         WebFileChooser fileChooser = new WebFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Файлы XML","xml");
-        fileChooser.addChoosableFileFilter(filter);
         fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.addChoosableFileFilter(filter);
 
         int result = fileChooser.showOpenDialog(mainView);
         if(result == WebFileChooser.APPROVE_OPTION) {
             File file =  fileChooser.getSelectedFile();
-            JAXBFIASSaver saver = new JAXBFIASSaver(this);
-            saver.saveFIAS(file);
+            JAXBFIASLoader loader = new JAXBFIASLoader(this);
+            loader.loadFIAS(file);
         }
     }
 
@@ -129,8 +131,8 @@ public class MainViewController implements SAXFIASReaderListener, FIASModelListe
     }
 
     @Override
-    public void saverMessage(String message) {
-        mainView.setSaverMessage(message);
+    public void jaxbMessage(String message) {
+        mainView.setJAXBMessage(message);
     }
 
 }
