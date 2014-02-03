@@ -5,29 +5,40 @@ import org.kesler.fiastester.dao.AbstractEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * Created by Алексей on 01.02.14.
  */
+
+@XmlAccessorType(XmlAccessType.NONE)
 @Entity
 @Table(name = "FIASRecords")
 public class FIASRecord extends AbstractEntity{
-
+    @XmlAttribute
     @Column(name = "AOGUID", length = 36)
     private String aoGUID;
 
+    @XmlAttribute
     @Column(name = "PARENTGUID", length = 36)
     private String parentGUID;
 
+    @XmlAttribute
     @Column(name = "FORMALNAME", length = 120)
     private String formalName;
 
+    @XmlAttribute
     @Column(name = "SHORTNAME", length = 10)
     private String shortName;
 
+    @XmlAttribute
     @Column(name = "REGIONCODE", length = 2)
     private String regionCode;
 
+    @XmlAttribute
     @Column(name = "AOLEVEL", length = 10)
     private String aoLevel;
 

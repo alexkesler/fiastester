@@ -1,6 +1,8 @@
 package org.kesler.fiastester.gui.main;
 
 import com.alee.laf.filechooser.WebFileChooser;
+import org.kesler.fiastester.jaxb.JAXBFIASSaver;
+import org.kesler.fiastester.jaxb.JAXBFIASSaverListener;
 import org.kesler.fiastester.logic.FIASModel;
 import org.kesler.fiastester.logic.FIASModelListener;
 import org.kesler.fiastester.sax.SAXFIASReader;
@@ -9,6 +11,7 @@ import org.kesler.fiastester.util.OptionsUtil;
 
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +19,7 @@ import java.util.List;
 /**
  * Created by alex on 02.02.14.
  */
-public class MainViewController implements SAXFIASReaderListener, FIASModelListener{
+public class MainViewController implements SAXFIASReaderListener, FIASModelListener, JAXBFIASSaverListener{
 
     private static MainViewController instance = null;
 
@@ -41,8 +44,13 @@ public class MainViewController implements SAXFIASReaderListener, FIASModelListe
         mainView.setVisible(true);
     }
 
+    public JFrame getMainView() {return mainView;}
+
     public void importFIAS() {
         WebFileChooser fileChooser = new WebFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Файлы XML","xml");
+        fileChooser.addChoosableFileFilter(filter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
 
         int result = fileChooser.showOpenDialog(mainView);
         if(result == WebFileChooser.APPROVE_OPTION) {
@@ -60,11 +68,32 @@ public class MainViewController implements SAXFIASReaderListener, FIASModelListe
 
     public void exportFIAS() {
         WebFileChooser fileChooser = new WebFileChooser();
-        int result = fileChooser.showOpenDialog(mainView);
-        if(result == WebFileChooser.APPROVE_OPTION) {
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Файлы XML","xml");
+        fileChooser.addChoosableFileFilter(filter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
 
+        int result = fileChooser.showSaveDialog(mainView);
+        if(result == WebFileChooser.APPROVE_OPTION) {
+            File file =  fileChooser.getSelectedFile();
+            JAXBFIASSaver saver = new JAXBFIASSaver(this);
+            saver.saveFIAS(file);
         }
     }
+
+    public void loadFIAS() {
+        WebFileChooser fileChooser = new WebFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Файлы XML","xml");
+        fileChooser.addChoosableFileFilter(filter);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        int result = fileChooser.showOpenDialog(mainView);
+        if(result == WebFileChooser.APPROVE_OPTION) {
+            File file =  fileChooser.getSelectedFile();
+            JAXBFIASSaver saver = new JAXBFIASSaver(this);
+            saver.saveFIAS(file);
+        }
+    }
+
 
     public void saxFIASReaderMessage(String message) {
         mainView.setSAXMessage(message);
@@ -94,10 +123,14 @@ public class MainViewController implements SAXFIASReaderListener, FIASModelListe
 //        mainView.setAddressVariants(addresses);
     }
 
+    @Override
     public void addresesFiltered(List<String> addreses) {
         mainView.setAddresses(addreses);
     }
 
-
+    @Override
+    public void saverMessage(String message) {
+        mainView.setSaverMessage(message);
+    }
 
 }

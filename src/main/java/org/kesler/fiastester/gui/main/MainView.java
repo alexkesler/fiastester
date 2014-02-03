@@ -23,6 +23,7 @@ public class MainView extends JFrame {
     private WebList addressesList;
     private WebPopup addressPopup;
     private WebTextField  addressTextField;
+    private JLabel jaxbMessageLabel;
 
 	public MainView(MainViewController controller) {
 		this.controller = controller;
@@ -35,7 +36,7 @@ public class MainView extends JFrame {
 
 	private void createGUI() {
 
-        JPanel mainPanel = new JPanel(new MigLayout("fill"));
+        JPanel mainPanel = new JPanel(new MigLayout("fillx, nogrid"));
 
         addressTextField = new WebTextField(30);
         addressPopup = new WebPopup(PopupStyle.lightSmall);
@@ -108,7 +109,17 @@ public class MainView extends JFrame {
             }
         });
 
-        saxMessageLabel = new JLabel("Сообщения о загрузке");
+        saxMessageLabel = new JLabel("Сообщение о загрузке");
+        saxMessageLabel.setBorder(BorderFactory.createEtchedBorder());
+
+        JButton loadFIASButton = new JButton("Загрузить ФИАС");
+        loadFIASButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.loadFIAS();
+            }
+        });
+
 
         JButton saveFIASButton = new JButton("Выгрузить ФИАС");
         saveFIASButton.addActionListener(new ActionListener() {
@@ -118,11 +129,16 @@ public class MainView extends JFrame {
             }
         });
 
+        jaxbMessageLabel = new JLabel("Сообщение о сохранении");
+        jaxbMessageLabel.setBorder(BorderFactory.createEtchedBorder());
+
 
         mainPanel.add(addressTextField, "wrap");
         mainPanel.add(readFIASButton, "wrap");
-        mainPanel.add(saxMessageLabel, "wrap");
+        mainPanel.add(saxMessageLabel, "growx, wrap");
+        mainPanel.add(loadFIASButton);
         mainPanel.add(saveFIASButton, "wrap");
+        mainPanel.add(jaxbMessageLabel, "growx, wrap");
 //        mainPanel.add(addressesListScrollPane, "span, grow");
 
 
@@ -133,6 +149,10 @@ public class MainView extends JFrame {
 
     public void setSAXMessage(String message) {
         saxMessageLabel.setText(message);
+    }
+
+    public void setJAXBMessage(String message) {
+        jaxbMessageLabel.setText(message);
     }
 
     public void setAddresses(List<String> addresses) {
