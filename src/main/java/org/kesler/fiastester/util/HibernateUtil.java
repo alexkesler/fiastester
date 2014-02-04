@@ -7,8 +7,11 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.HibernateException;
 import java.util.Properties;
 
+import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
+import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
+import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.kesler.fiastester.logic.FIASRecord;
 import org.kesler.fiastester.util.OptionsUtil;
 
@@ -58,7 +61,7 @@ public class HibernateUtil {
 		hibernateProperties.setProperty("hibernate.connection.username",userName);
 		hibernateProperties.setProperty("hibernate.connection.password",password);
 
-		hibernateProperties.setProperty("hibernate.c3p0.minPoolSize","5");
+		hibernateProperties.setProperty("hibernate.c3p0.minPoolSize","1");
 		hibernateProperties.setProperty("hibernate.c3p0.maxPoolSize","20");
 		hibernateProperties.setProperty("hibernate.c3p0.timeout","1800");
 		hibernateProperties.setProperty("hibernate.c3p0.max_statement","50");
@@ -93,6 +96,17 @@ public class HibernateUtil {
 
 	public static void closeConnection() {
 		if (sessionFactory != null) {
+            if (sessionFactory instanceof SessionFactoryImpl) {
+                SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
+                ConnectionProvider conn = sf.getConnectionProvider();
+                // Закрытие для C3P0
+                if(conn instanceof C3P0ConnectionProvider) {
+                    ((C3P0ConnectionProvider)conn).close();
+//                    try {
+//                        Thread.sleep(2000);
+//                    } catch (InterruptedException ie) {}
+                }
+            }
 			sessionFactory.close();
 			sessionFactory = null;
 		}	
